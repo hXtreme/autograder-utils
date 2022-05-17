@@ -21,7 +21,6 @@ def cmake(build_dir="./build", run_make=True, clean=False) -> None:
         os.system(f"rm -rf {build_dir}")
         os.system(f"mkdir -p {build_dir}")
     with ctx.pushd(build_dir):
-        print(f"Building with cmake in {build_dir}")
         cmake_process = subprocess.run(
             ["cmake", ".."],
             stdout=PIPE,
