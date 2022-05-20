@@ -5,10 +5,10 @@ import json
 
 from dataclasses import asdict, dataclass, field, InitVar
 from enum import Enum
-from typing import Any
+from typing import List
 
 
-class Visibility(Enum):
+class Visibility(str, Enum):
     """
     Enum for visibility.
     """
@@ -41,36 +41,44 @@ class Test:
                 "." if self.number is not None else ""
             ) + f"{number_minor}"
 
-
+@dataclass
 class Result:
-    def __init__(
-        self,
-        visibility: Visibility = None,
-        stdout_visibility: Visibility = None,
-        **kwargs,
-    ):
-        self.__json = {}
-        self.tests = []
-        if visibility is not None:
-            self.__json["visibility"] = visibility
-        if stdout_visibility is not None:
-            self.__json["stdout_visibility"] = stdout_visibility
-        self.__json.update(kwargs)
+    score: float = field(default=None)
+    execution_time: float = field(default=None)
+    output: str = field(default="")
+    visibility: Visibility = Visibility.VISIBLE
+    stdout_visibility: Visibility = Visibility.VISIBLE
+    extra_data: dict = field(default_factory=dict)
+    tests: List[Test] = field(default_factory=list)
+    leaderboard: List[dict] = field(default=None)
 
-    def add_test(self, test: Test):
-        self.tests.append(test)
-        return self
+    def __to_dict__(self):
+        def clean(dt):
+            if dt is None or dt == "":
+                return None
+            if isinstance(dt, dict):
+                d = {}
+                for k, v in dt.items():
+                    v = clean(v)
+                    if v is not None:
+                        d[k] = clean(v)
+                if len(d) == 0:
+                    return None
+                return d
+            if isinstance(dt, list):
+                d = []
+                for v in dt:
+                    v = clean(v)
+                    if v is not None:
+                        d.append(v)
+                if len(d) == 0:
+                    return None
+                return d
+            return dt
+        dict_rep = clean(asdict(self))
+        return dict_rep
 
     def dump(self, path: str = "results.json"):
-        _json = self.__json.copy()
-        _json["tests"] = list(map(asdict, self.tests))
+        dict_rep = self.__to_dict__()
         with open(path, "w") as f:
-            json.dump(_json, f, indent=2)
-
-    def __setattr__(self, __name: str, __value: Any):
-        cls_name = self.__class__.__name__
-        if __name == f"_{cls_name}__json" or __name == "tests":
-            super().__setattr__(__name, __value)
-        else:
-            self.__json[__name] = __value
-        return self
+            json.dump(dict_rep, f, indent=2)
