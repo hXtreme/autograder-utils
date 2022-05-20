@@ -65,8 +65,12 @@ class Result:
         _json = self.__json.copy()
         _json["tests"] = list(map(asdict, self.tests))
         with open(path, "w") as f:
-            json.dump(self.__json, f, indent=2)
+            json.dump(_json, f, indent=2)
 
     def __setattr__(self, __name: str, __value: Any):
-        self.__json[__name] = __value
+        cls_name = self.__class__.__name__
+        if __name == f"_{cls_name}__json" or __name == "tests":
+            super().__setattr__(__name, __value)
+        else:
+            self.__json[__name] = __value
         return self
