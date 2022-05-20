@@ -41,6 +41,7 @@ class Test:
                 "." if self.number is not None else ""
             ) + f"{number_minor}"
 
+
 @dataclass
 class Result:
     score: float = field(default=None)
@@ -75,6 +76,7 @@ class Result:
                     return None
                 return d
             return dt
+
         dict_rep = clean(asdict(self))
         return dict_rep
 
