@@ -12,7 +12,7 @@ setup(
     author="Harsh Parekh",
     author_email="harsh_parekh@outlook.com",
     url="https://git.parekh.page/autograder-utils",
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     description="A library of python functions to make building autograder simpler.",
     license="MIT",
     packages=find_packages(include=["agu", "agu.*"]),
