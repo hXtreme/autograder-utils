@@ -7,9 +7,9 @@ import contextlib
 @contextlib.contextmanager
 def pushd(newdir):
     """Context manager to go into a directory and return back when done."""
-    prevdir = os.getcwd()
-    os.chdir(os.path.expanduser(newdir))
+    prevdir, newdir = os.getcwd(), os.path.expanduser(newdir)
+    os.chdir(newdir)
     try:
-        yield
+        yield newdir
     finally:
         os.chdir(prevdir)
